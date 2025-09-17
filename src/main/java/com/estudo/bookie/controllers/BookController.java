@@ -3,6 +3,7 @@ package com.estudo.bookie.controllers;
 import com.estudo.bookie.entities.Book;
 import com.estudo.bookie.entities.dtos.BookRequestDto;
 import com.estudo.bookie.services.BookService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -30,14 +31,14 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<BookRequestDto> save(@RequestBody BookRequestDto bookRequestDto) {
+    public ResponseEntity<BookRequestDto> save(@Valid @RequestBody BookRequestDto bookRequestDto) {
       BookRequestDto book = bookService.save(bookRequestDto);
       URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(book.id()).toUri();
       return ResponseEntity.created(uri).body(book);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BookRequestDto> update(@PathVariable Long id,@RequestBody BookRequestDto bookRequestDto) {
+    public ResponseEntity<BookRequestDto> update(@PathVariable Long id,@Valid @RequestBody BookRequestDto bookRequestDto) {
         return ResponseEntity.ok(bookService.update(id, bookRequestDto));
     }
 

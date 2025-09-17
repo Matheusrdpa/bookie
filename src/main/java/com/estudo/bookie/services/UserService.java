@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -39,7 +41,10 @@ public class UserService {
     @Transactional
     public UserResponseDto save(UserRequestDto userRequestDto) {
         User user = UserMapper.INSTANCE.requestToUser(userRequestDto);
-        user.setPassword(userRequestDto.password());
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        Set<String> roles = new HashSet<>();
+        roles.add("USER");
+        user.setRoles(roles);
         user = userRepository.save(user);
         return UserMapper.INSTANCE.toUserResponseDto(user);
     }
