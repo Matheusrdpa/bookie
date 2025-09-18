@@ -1,5 +1,6 @@
 package com.estudo.bookie.services;
 
+import com.estudo.bookie.entities.CustomUserDetails;
 import com.estudo.bookie.entities.User;
 import com.estudo.bookie.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,9 +22,6 @@ public class UserDetailService implements UserDetailsService {
     }
 
     public UserDetails mapUserToDetails(User user) {
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRoles().toArray(new String[0])).build();
+        return new CustomUserDetails(user);
     }
 }

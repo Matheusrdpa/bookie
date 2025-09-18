@@ -4,7 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 
-@Table(name = "tb_user_books")
+@Table(
+        name = "tb_user_books",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id", "book_id"})
+        }
+)
 @Entity
 public class UserBook {
     @Id

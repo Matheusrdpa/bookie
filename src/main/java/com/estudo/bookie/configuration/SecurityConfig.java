@@ -29,7 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/v1/auth/register").permitAll()
                         .requestMatchers("/v1/auth/login").permitAll()
                         .requestMatchers("/v1/author").hasRole("USER")
-                        .requestMatchers("/v1/userbook/**").permitAll()
+                        .requestMatchers("/v1/userbook/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf-> csrf.disable())

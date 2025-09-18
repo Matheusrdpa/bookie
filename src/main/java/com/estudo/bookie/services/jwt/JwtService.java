@@ -16,7 +16,8 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private String secret = "IASUHIUASHFUASHIASUIHASIUDHAIUSDHIAJNSHUDHNASUDHNUAISDNUISDHNAUSHDNISDHAUSISDUHD";
+    @Value("${my-secret-key}")
+    private String secret;
 
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()

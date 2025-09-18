@@ -27,8 +27,12 @@ public class UserBookService {
 
     @Transactional
     public UserBookResponseDto addBookToUserLibrary(Long userId, UserBookRequestDto userBookRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFound("User Not Found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFound("Book can only be added to your library"));
         Book book = bookRepository.findById(userBookRequestDto.bookId()).orElseThrow(() -> new ResourceNotFound("Book Not Found"));
+
+        if (userBookRepository.findByUserIdAndBookId(userId, book.getId()).isPresent()) {
+            throw new RuntimeException("This book already exists in user library");
+        }
 
         UserBook userBook = new UserBook();
         userBook.setUser(user);
@@ -36,5 +40,11 @@ public class UserBookService {
         userBook.setRating(userBookRequestDto.rating());
         userBookRepository.save(userBook);
         return UserBookMapper.INSTANCE.toUserBookResponseDto(userBook);
+    }
+
+    @Transactional
+    public void deleteBookFromUserLibrary(Long userId, Long bookId) {
+        UserBook userBook = userBookRepository.findByUserIdAndBookId(userId, bookId).orElseThrow(() -> new ResourceNotFound("Book Not Found"));
+        userBookRepository.delete(userBook);
     }
 }
