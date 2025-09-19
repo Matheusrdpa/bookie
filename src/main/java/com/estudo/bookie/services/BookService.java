@@ -5,8 +5,10 @@ import com.estudo.bookie.entities.Book;
 import com.estudo.bookie.entities.dtos.BookRequestDto;
 import com.estudo.bookie.repositories.AuthorRepository;
 import com.estudo.bookie.repositories.BookRepository;
+import com.estudo.bookie.services.exceptions.DataIntegrityException;
 import com.estudo.bookie.services.exceptions.ResourceNotFound;
 import com.estudo.bookie.services.mappers.BookAuthorMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +61,6 @@ public class BookService {
         if (!bookRepository.existsById(id)) {
             throw new ResourceNotFound("Book not found");
         }
-        bookRepository.deleteById(id);
+            bookRepository.deleteById(id);
     }
 }

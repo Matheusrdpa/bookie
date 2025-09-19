@@ -1,6 +1,7 @@
 package com.estudo.bookie.controllers.ExceptionHandler;
 
 import com.estudo.bookie.entities.dtos.exception.ErrorDto;
+import com.estudo.bookie.services.exceptions.DataIntegrityException;
 import com.estudo.bookie.services.exceptions.ResourceNotFound;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,13 @@ public class GlobalHandler {
                 .findFirst()
                 .orElse("Validation error");
         ErrorDto errorDto = new ErrorDto(Instant.now(),errorMessage,status.value(),request.getRequestURI());
+        return ResponseEntity.status(status).body(errorDto);
+    }
+
+    @ExceptionHandler(DataIntegrityException.class)
+    public ResponseEntity<ErrorDto> handleDataIntegrity(DataIntegrityException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorDto errorDto = new ErrorDto(Instant.now(),ex.getMessage(),status.value(),request.getRequestURI());
         return ResponseEntity.status(status).body(errorDto);
     }
 

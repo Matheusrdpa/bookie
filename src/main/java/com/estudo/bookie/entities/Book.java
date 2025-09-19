@@ -1,7 +1,7 @@
 package com.estudo.bookie.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMax;
+
 
 @Entity
 @Table(name = "tb_books")

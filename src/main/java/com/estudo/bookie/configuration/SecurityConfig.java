@@ -3,6 +3,7 @@ package com.estudo.bookie.configuration;
 import com.estudo.bookie.services.jwt.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,8 +29,12 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/v1/auth/register").permitAll()
                         .requestMatchers("/v1/auth/login").permitAll()
-                        .requestMatchers("/v1/author").hasRole("USER")
-                        .requestMatchers("/v1/userbook/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/v1/author").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/v1/author").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/v1/author").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/v1/book").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/v1/book").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/v1/book").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf-> csrf.disable())

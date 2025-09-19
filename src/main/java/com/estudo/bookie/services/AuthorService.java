@@ -3,8 +3,10 @@ package com.estudo.bookie.services;
 import com.estudo.bookie.entities.Author;
 import com.estudo.bookie.entities.dtos.AuthorRequestDto;
 import com.estudo.bookie.repositories.AuthorRepository;
+import com.estudo.bookie.services.exceptions.DataIntegrityException;
 import com.estudo.bookie.services.exceptions.ResourceNotFound;
 import com.estudo.bookie.services.mappers.BookAuthorMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,9 +54,11 @@ public class AuthorService {
         if(!authorRepository.existsById(id)) {
             throw new ResourceNotFound("Author not found");
         }
-        authorRepository.deleteById(id);
+        try {
+            authorRepository.deleteById(id);
+        }catch (DataIntegrityViolationException e){
+            throw new DataIntegrityException("Entity depends on another entity and can't be removed");
+        }
     }
-
-
 }
 
