@@ -1,6 +1,6 @@
 package com.estudo.bookie.entities.dtos;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-public record UserBookRequestDto(@NotBlank(message = "Please pick a book")Long bookId, Double rating) {
+public record UserBookRequestDto(@NotNull(message = "Please pick a book")Long bookId, Double rating) {
 }

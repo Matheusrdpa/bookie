@@ -43,7 +43,7 @@ public class UserService {
         User user = UserMapper.INSTANCE.requestToUser(userRequestDto);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         Set<String> roles = new HashSet<>();
-        roles.add("USER");
+        roles.add("ADMIN");
         user.setRoles(roles);
         user = userRepository.save(user);
         return UserMapper.INSTANCE.toUserResponseDto(user);

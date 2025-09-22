@@ -10,8 +10,14 @@ import com.estudo.bookie.repositories.UserBookRepository;
 import com.estudo.bookie.repositories.UserRepository;
 import com.estudo.bookie.services.exceptions.ResourceNotFound;
 import com.estudo.bookie.services.mappers.UserBookMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserBookService {
@@ -46,5 +52,22 @@ public class UserBookService {
     public void deleteBookFromUserLibrary(Long userId, Long bookId) {
         UserBook userBook = userBookRepository.findByUserIdAndBookId(userId, bookId).orElseThrow(() -> new ResourceNotFound("Book Not Found"));
         userBookRepository.delete(userBook);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserBookResponseDto> getUserLibrary(String username, Pageable pageable) {
+        Page<UserBook> page = userBookRepository.findByUserUsername(username,pageable);
+        if (page.isEmpty()) {
+            throw new ResourceNotFound("No user library found");
+        }
+       return page.map(UserBookMapper.INSTANCE::toUserBookResponseDto);
+    }
+
+    @Transactional
+    public UserBookResponseDto updateUserBook(Long userId, Long bookId, Double rating) {
+        UserBook userBook = userBookRepository.findByUserIdAndBookId(userId, bookId).orElseThrow(() -> new ResourceNotFound("Book or User Not Found"));
+        userBook.setRating(rating);
+        userBookRepository.save(userBook);
+        return UserBookMapper.INSTANCE.toUserBookResponseDto(userBook);
     }
 }
