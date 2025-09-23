@@ -6,11 +6,13 @@ import com.estudo.bookie.entities.dtos.UpdateRatingRequest;
 import com.estudo.bookie.entities.dtos.UserBookRequestDto;
 import com.estudo.bookie.entities.dtos.UserBookResponseDto;
 import com.estudo.bookie.services.UserBookService;
+import com.estudo.bookie.services.exceptions.ResourceNotFound;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +52,24 @@ public class UserBookController {
        return ResponseEntity.ok(page);
     }
 
-    @PatchMapping("/library/{bookId}")
+    @PatchMapping("/{username}/books/{bookId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserBookResponseDto> updateBookRating(@PathVariable Long bookId, @AuthenticationPrincipal CustomUserDetails loggedUser, @RequestBody UpdateRatingRequest ratingRequest) {
+    public ResponseEntity<UserBookResponseDto> updateBookRating(@PathVariable String username,@PathVariable Long bookId, @AuthenticationPrincipal CustomUserDetails loggedUser, @RequestBody UpdateRatingRequest ratingRequest) {
+        String loggedUsername = loggedUser.getUsername();
+        if (!loggedUsername.equalsIgnoreCase(username)) {
+            throw new AccessDeniedException("Você só pode alterar sua própria biblioteca!");
+        }
         return ResponseEntity.ok(userBookService.updateUserBook(bookId,loggedUser.getId(), ratingRequest.rating()));
+    }
+
+    @DeleteMapping("/{username}/books/{bookId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> removeBookFromLibrary(@PathVariable String username, @PathVariable Long bookId, @AuthenticationPrincipal CustomUserDetails loggedUser) {
+        String loggedUsername = loggedUser.getUsername();
+        if (!loggedUsername.equalsIgnoreCase(username)) {
+            throw new AccessDeniedException("Você só pode alterar sua própria biblioteca!");
+        }
+        userBookService.deleteBookFromUserLibrary(bookId, loggedUser.getId());
+        return ResponseEntity.noContent().build();
     }
 }
