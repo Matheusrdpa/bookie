@@ -8,6 +8,7 @@ import com.estudo.bookie.entities.dtos.UserBookResponseDto;
 import com.estudo.bookie.repositories.BookRepository;
 import com.estudo.bookie.repositories.UserBookRepository;
 import com.estudo.bookie.repositories.UserRepository;
+import com.estudo.bookie.services.exceptions.DuplicateResource;
 import com.estudo.bookie.services.exceptions.ResourceNotFound;
 import com.estudo.bookie.services.mappers.UserBookMapper;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public class UserBookService {
         Book book = bookRepository.findById(userBookRequestDto.bookId()).orElseThrow(() -> new ResourceNotFound("Book Not Found"));
 
         if (userBookRepository.findByUserIdAndBookId(userId, book.getId()).isPresent()) {
-            throw new RuntimeException("This book already exists in user library");
+            throw new DuplicateResource("This book already exists in user library");
         }
 
         UserBook userBook = new UserBook();
