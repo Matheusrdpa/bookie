@@ -6,6 +6,7 @@ import com.estudo.bookie.entities.dtos.UserRequestDto;
 import com.estudo.bookie.entities.dtos.UserResponseDto;
 import com.estudo.bookie.services.UserService;
 import com.estudo.bookie.services.jwt.JwtService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         UserResponseDto userResponseDto = userService.save(userRequestDto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(userResponseDto.id()).toUri();
         return ResponseEntity.created(uri).body(userResponseDto);

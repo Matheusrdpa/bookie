@@ -52,9 +52,11 @@ public class UserService {
     @Transactional
     public UserResponseDto update(Long id, UserRequestDto userRequestDto) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFound("User not found"));
-        user.setEmail(user.getEmail());
-        user.setUsername(user.getUsername());
-        user.setPassword(user.getPassword());
+        user.setEmail(userRequestDto.email());
+        user.setUsername(userRequestDto.username());
+        if (userRequestDto.password() != null) {
+            user.setPassword(bCryptPasswordEncoder.encode(userRequestDto.password()));
+        }
         user = userRepository.save(user);
         return UserMapper.INSTANCE.toUserResponseDto(user);
     }
