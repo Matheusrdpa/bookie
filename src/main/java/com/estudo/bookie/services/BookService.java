@@ -9,12 +9,17 @@ import com.estudo.bookie.services.exceptions.DataIntegrityException;
 import com.estudo.bookie.services.exceptions.ResourceNotFound;
 import com.estudo.bookie.services.mappers.BookAuthorMapper;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
+
+import static com.estudo.bookie.services.specifications.BookSpecifications.*;
 
 
 @Service
@@ -27,10 +32,14 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookRequestDto> findAll() {
-        List<Book> books = bookRepository.findAll();
-        List<BookRequestDto> bookRequestDtos = books.stream().map(BookAuthorMapper.INSTANCE::bookToBookRequestDto).toList();
-        return bookRequestDtos;
+    public Page<BookRequestDto> findAll(String title, String author, Double rating, Pageable pageable) {
+        Specification<Book> spec =
+                hasTitle(title)
+                        .and(hasAuthor(author))
+                        .and(minRating(rating));
+
+        Page<Book> books = bookRepository.findAll(spec, pageable);
+        return books.map(BookAuthorMapper.INSTANCE::bookToBookRequestDto);
     }
 
     @Transactional(readOnly = true)

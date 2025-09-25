@@ -41,7 +41,6 @@ public class UserServiceTest {
 
     Long existingId = 1L;
     Long nonExistingId = 99L;
-    Long dependentId = 2L;
     User user = UserFactory.createUser();
     List<User> users = List.of(user);
 

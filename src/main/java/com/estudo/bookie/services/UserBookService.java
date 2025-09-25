@@ -71,10 +71,4 @@ public class UserBookService {
         userBookRepository.save(userBook);
         return UserBookMapper.INSTANCE.toUserBookResponseDto(userBook);
     }
-
-    @Transactional
-    public void removeUserFromUserLibrary(Long userId, Long bookId) {
-        UserBook userBook = userBookRepository.findByUserIdAndBookId(userId, bookId).orElseThrow(() -> new ResourceNotFound("Book or User Not Found"));
-        userBookRepository.delete(userBook);
-    }
 }

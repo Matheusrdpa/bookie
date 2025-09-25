@@ -1,16 +1,16 @@
 package com.estudo.bookie.controllers;
 
-import com.estudo.bookie.entities.Book;
 import com.estudo.bookie.entities.dtos.BookRequestDto;
 import com.estudo.bookie.services.BookService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-
 import java.net.URI;
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/v1/book")
@@ -21,8 +21,12 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookRequestDto>> findAll() {
-        return ResponseEntity.ok(bookService.findAll());
+    public ResponseEntity<Page<BookRequestDto>> findAll(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) Double rating,
+            Pageable pageable) {
+        return ResponseEntity.ok(bookService.findAll(title,author, rating,pageable));
     }
 
     @GetMapping("/{id}")
