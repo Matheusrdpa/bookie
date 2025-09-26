@@ -45,6 +45,7 @@ public class UserBookService {
         userBook.setUser(user);
         userBook.setBook(book);
         userBook.setRating(userBookRequestDto.rating());
+        userBook.setStatus(userBookRequestDto.status());
         userBookRepository.save(userBook);
         return UserBookMapper.INSTANCE.toUserBookResponseDto(userBook);
     }

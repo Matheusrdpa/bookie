@@ -1,11 +1,14 @@
 package com.estudo.bookie.controllers;
 
+import com.estudo.bookie.entities.CustomUserDetails;
 import com.estudo.bookie.entities.dtos.BookRequestDto;
 import com.estudo.bookie.services.BookService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -50,5 +53,15 @@ public class BookController {
     public ResponseEntity<BookRequestDto> delete(@PathVariable Long id) {
         bookService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/recommended")
+    public Page<BookRequestDto> getRecommendedBooks(
+            @AuthenticationPrincipal CustomUserDetails loggedUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bookService.recommendBooks(loggedUser.getId(), pageable);
     }
 }

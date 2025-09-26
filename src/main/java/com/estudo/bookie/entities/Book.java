@@ -11,19 +11,30 @@ public class Book {
     private Long id;
     @Column(nullable = false)
     private String title;
+    private String genre;
     @Column(columnDefinition = "TEXT")
     private String description;
     private Double rating;
+
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private Author author;
 
-    public Book(Long id, String title, Author author, Double rating, String description) {
+    public Book(Long id, String title, Author author, Double rating, String description, String genre) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.rating = rating;
         this.description = description;
+        this.genre = genre;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
     }
 
     public String getDescription() {
