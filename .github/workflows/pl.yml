@@ -29,4 +29,38 @@ jobs:
         with:
           name: 'bookie-api-final'
           path: target/*.jar
-          retention-days: 1
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/head/main'
+
+    steps:
+      - name: Download artifact from previous build
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: target/
+
+      - name: Copy jar to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{secrets.EC2_KEY}}
+          source: "target/*.jar"
+          target: "/home/ec2-user/app"
+          strip_components: 1
+
+      - name: Restart App
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo mv /home/ec2-user/app/*.jar /home/ec2-user/bookie.jar
+            sudo systemctl restart bookie
+            sleep 5
+            sudo systemctl status bookie
