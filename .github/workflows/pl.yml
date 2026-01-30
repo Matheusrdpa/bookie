@@ -22,7 +22,7 @@ jobs:
           cache: maven
 
       - name: Grant execute permissions
-        run: chmod -x mvnw
+        run: chmod +x mvnw
 
       - name: Build with maven
         run: ./mvnw clean verify
