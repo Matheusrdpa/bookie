@@ -42,9 +42,9 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
     Edite o arquivo `src/main/resources/application-dev.properties` com as credenciais do seu PostgreSQL.
 
     ```
-    spring.datasource.url=${SPRING_DATASOURCE_URL}
-    spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
-    spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+    spring.datasource.url=${SPRING_DATA_URL}
+    spring.datasource.username=${SPRING_DATA_USERNAME}
+    spring.datasource.password=${SPRING_DATA_PASSWORD}
     ```
 3.  **Adicione a Chave Secreta do JWT:**
     Adicionar sua chave secreta (variável de ambiente ou arquivo .properties):
