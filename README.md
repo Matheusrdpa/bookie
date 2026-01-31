@@ -1,4 +1,10 @@
-# Bookie API
+# Bookie API 
+
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![CI/CD Pipeline](https://github.com/matheusrdpa/bookie/actions/workflows/pl.yml/badge.svg)
 
 Backend desenvolvido com Spring Boot para gerenciar livros, autores e a biblioteca pessoal dos usuários.
 A ideia do projeto é simples: manter um catálogo organizado, registrar o status de leitura e sugerir novos livros com base no que a pessoa já leu.
@@ -14,6 +20,13 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
 | **Banco de Dados** | PostgreSQL 
 | **Utilidades** | MapStruct, Validation 
 | **Testes** | JUnit 5, Mockito
+
+## Infraestrutura & DevOps 
+
+* **Containerização:** Docker & Docker Hub
+* **CI/CD:** GitHub Actions (Automated Build, Test & Deploy)
+* **Cloud Provider:** AWS (EC2 / Amazon Linux 2023)
+* **Database:** AWS RDS (PostgreSQL)
 
 ## O que a API faz
 
