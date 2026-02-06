@@ -109,6 +109,7 @@ O projeto tem testes unitarios e de integração com:
 
 * JUnit
 * Mockito
+* Rest Assured
 -----
 
 Para executar todos os testes, utilize o comando:
