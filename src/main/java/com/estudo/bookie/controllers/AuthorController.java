@@ -1,9 +1,9 @@
 package com.estudo.bookie.controllers;
 
-import com.estudo.bookie.entities.Author;
 import com.estudo.bookie.entities.dtos.AuthorRequestDto;
 import com.estudo.bookie.services.AuthorService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -32,6 +32,7 @@ public class AuthorController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthorRequestDto> save(@RequestBody AuthorRequestDto author) {
         AuthorRequestDto authorSaved = authorService.save(author);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(authorSaved.id()).toUri();
@@ -39,12 +40,14 @@ public class AuthorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthorRequestDto> update(@PathVariable Long id,@RequestBody AuthorRequestDto author) {
         AuthorRequestDto authorUpdated = authorService.update(id, author);
         return ResponseEntity.ok(authorUpdated);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         authorService.delete(id);
         return ResponseEntity.noContent().build();
