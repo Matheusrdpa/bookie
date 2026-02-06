@@ -19,7 +19,7 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
 | **Persistência** | Spring Data JPA, Hibernate 
 | **Banco de Dados** | PostgreSQL 
 | **Utilidades** | MapStruct, Validation 
-| **Testes** | JUnit 5, Mockito
+| **Testes** | JUnit 5, Mockito, Rest Assured
 
 ## Infraestrutura & DevOps 
 
