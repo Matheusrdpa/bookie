@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -24,7 +25,7 @@ import java.util.Set;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BookControllerIT {
+public class BookControllerTest {
 
     @LocalServerPort
     private int port;
@@ -127,6 +128,7 @@ public class BookControllerIT {
     }
 
     @Test
+    @DisplayName("Should fail when user is not authenticated")
     void Createbook_Should_Fail_When_No_Token(){
         BookRequestDto bookRequestDto = new BookRequestDto(null, "Mistborn",1L,5.0,"Fantasy","desc");
 
@@ -137,5 +139,104 @@ public class BookControllerIT {
                 .post("v1/book")
                 .then()
                 .statusCode(403);
+    }
+    @Test
+    @DisplayName("Should return book by ID")
+    void findById_Should_Return_200(){
+        AuthorRequestDto authorDto = new AuthorRequestDto(null, "George Orwell", "Bio", null);
+        Integer authorId = given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON).body(authorDto)
+                .when().post("/v1/author").then().statusCode(201).extract().path("id");
+
+        BookRequestDto bookDto = new BookRequestDto(null, "1984", authorId.longValue(), 5.0, "Dystopian", "Big Brother");
+        Integer bookId = given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON).body(bookDto)
+                .when().post("/v1/book").then().statusCode(201).extract().path("id");
+
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .when()
+                .get("/v1/book/{id}", bookId)
+                .then()
+                .statusCode(200)
+                .body("title", equalTo("1984"));
+    }
+
+    @Test
+    @DisplayName("Should return list of books")
+    void findAll_Should_Return_200(){
+        given().header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/v1/book")
+                .then()
+                .statusCode(200)
+                .body("content", notNullValue());
+    }
+
+    @Test
+    @DisplayName("Should update specific book and return 200")
+    void update_Should_Return_200(){
+
+        AuthorRequestDto authorDto = new AuthorRequestDto(null, "Update Author", "Bio", null);
+        Integer authorId = given().header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON).body(authorDto).when().post("/v1/author").path("id");
+
+        BookRequestDto originalBook = new BookRequestDto(null, "Old Title", authorId.longValue(), 1.0, "Old Genre", "Desc");
+        Integer bookId = given().header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON).body(originalBook).when().post("/v1/book").path("id");
+
+
+        BookRequestDto updatedBook = new BookRequestDto(null, "New Title", authorId.longValue(), 5.0, "New Genre", "Desc");
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body(updatedBook)
+                .when()
+                .put("/v1/book/{id}", bookId)
+                .then()
+                .statusCode(200)
+                .body("title", equalTo("New Title"));
+    }
+
+    @Test
+    @DisplayName("DELETE Should delete book")
+    void delete_Should_Return_204(){
+
+        AuthorRequestDto authorDto = new AuthorRequestDto(null, "Delete Author", "Bio", null);
+        Integer authorId = given().header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON).body(authorDto).when().post("/v1/author").path("id");
+
+        BookRequestDto book = new BookRequestDto(null, "To Delete", authorId.longValue(), 1.0, "Genre", "Desc");
+        Integer bookId = given().header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON).body(book).when().post("/v1/book").path("id");
+
+
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .when()
+                .delete("/v1/book/{id}", bookId)
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    @DisplayName("Should return 200 and a page of books")
+    void getRecommendedBooks_Should_Return_200() {
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .queryParam("page", 0)
+                .queryParam("size", 10)
+                .when()
+                .get("/v1/book/recommended")
+                .then()
+                .statusCode(200)
+                .body("content", notNullValue())
+                .body("totalElements", notNullValue());
     }
 }
