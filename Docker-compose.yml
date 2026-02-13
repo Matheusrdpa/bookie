@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-broker
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - bookie-network
+
+  db-bookie:
+    image: postgres:17
+    container_name: db-bookie
+    environment:
+      POSTGRES_USER: ${SPRING_DATA_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATA_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - bookie-network
+
+  db-timeline:
+    image: postgres:17
+    container_name: db-timeline
+    environment:
+      POSTGRES_USER: ${SPRING_DATA_USERNAME_TIMELINE}
+      POSTGRES_PASSWORD: ${SPRING_DATA_PASSWORD_TIMELINE}
+      POSTGRES_DB: ${POSTGRES_DB_TIMELINE}
+    ports:
+      - "5433:5432"
+    networks:
+      - bookie-network
+
+networks:
+  bookie-network:
+    driver: bridge

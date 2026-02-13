@@ -3,6 +3,7 @@ package com.estudo.bookie.services;
 import com.estudo.bookie.entities.Book;
 import com.estudo.bookie.entities.User;
 import com.estudo.bookie.entities.UserBook;
+import com.estudo.bookie.entities.dtos.BookRequestDto;
 import com.estudo.bookie.entities.dtos.UserBookRequestDto;
 import com.estudo.bookie.entities.dtos.UserBookResponseDto;
 import com.estudo.bookie.repositories.BookRepository;
@@ -15,27 +16,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.estudo.bookie.rabbit.producer.RabbitProd;
 
 @Service
 public class UserBookService {
     private UserRepository userRepository;
     private BookRepository bookRepository;
     private UserBookRepository userBookRepository;
+    private RabbitProd rabbitProd;
 
-    public UserBookService(UserRepository userRepository, BookRepository bookRepository, UserBookRepository userBookRepository) {
+    public UserBookService(UserRepository userRepository, BookRepository bookRepository, UserBookRepository userBookRepository,RabbitProd rabbitProd) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.userBookRepository = userBookRepository;
+        this.rabbitProd = rabbitProd;
     }
 
     @Transactional
     public UserBookResponseDto addBookToUserLibrary(Long userId, UserBookRequestDto userBookRequestDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFound("Book can only be added to your library"));
         Book book = bookRepository.findById(userBookRequestDto.bookId()).orElseThrow(() -> new ResourceNotFound("Book Not Found"));
+        BookRequestDto bookRequestDto = new BookRequestDto(book.getId(), book.getTitle(),book.getAuthor().getId(), userBookRequestDto.rating(), book.getGenre(),book.getDescription());
 
         if (userBookRepository.findByUserIdAndBookId(userId, book.getId()).isPresent()) {
             throw new DuplicateResource("This book already exists in user library");
@@ -47,6 +48,7 @@ public class UserBookService {
         userBook.setRating(userBookRequestDto.rating());
         userBook.setStatus(userBookRequestDto.status());
         userBookRepository.save(userBook);
+        rabbitProd.sendMessage(bookRequestDto);
         return UserBookMapper.INSTANCE.toUserBookResponseDto(userBook);
     }
 
