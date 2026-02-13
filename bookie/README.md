@@ -1,4 +1,10 @@
-# Bookie API
+# Bookie API 
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![CI/CD Pipeline](https://github.com/matheusrdpa/bookie/actions/workflows/pl.yml/badge.svg)
+![Coverage](https://img.shields.io/badge/Coverage-85%25-brightgreen.svg)
 
 Backend desenvolvido com Spring Boot para gerenciar livros, autores e a biblioteca pessoal dos usuários.
 A ideia do projeto é simples: manter um catálogo organizado, registrar o status de leitura e sugerir novos livros com base no que a pessoa já leu.
@@ -13,7 +19,14 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
 | **Persistência** | Spring Data JPA, Hibernate 
 | **Banco de Dados** | PostgreSQL 
 | **Utilidades** | MapStruct, Validation 
-| **Testes** | JUnit 5, Mockito
+| **Testes** | JUnit 5, Mockito, Rest Assured
+
+## Infraestrutura & DevOps 
+
+* **Containerização:** Docker & Docker Hub
+* **CI/CD:** GitHub Actions (Automated Build, Test & Deploy)
+* **Cloud Provider:** AWS (EC2 / Amazon Linux 2023)
+* **Database:** AWS RDS (PostgreSQL)
 
 ## O que a API faz
 
@@ -42,9 +55,9 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
     Edite o arquivo `src/main/resources/application-dev.properties` com as credenciais do seu PostgreSQL.
 
     ```
-    spring.datasource.url=${SPRING_DATASOURCE_URL}
-    spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
-    spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+    spring.datasource.url=${SPRING_DATA_URL}
+    spring.datasource.username=${SPRING_DATA_USERNAME}
+    spring.datasource.password=${SPRING_DATA_PASSWORD}
     ```
 3.  **Adicione a Chave Secreta do JWT:**
     Adicionar sua chave secreta (variável de ambiente ou arquivo .properties):
@@ -96,6 +109,7 @@ O projeto tem testes unitarios e de integração com:
 
 * JUnit
 * Mockito
+* Rest Assured
 -----
 
 Para executar todos os testes, utilize o comando:

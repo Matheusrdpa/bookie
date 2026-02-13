@@ -59,7 +59,7 @@ public class UserBookController {
         if (!loggedUsername.equalsIgnoreCase(username)) {
             throw new AccessDeniedException("Você só pode alterar sua própria biblioteca!");
         }
-        return ResponseEntity.ok(userBookService.updateUserBook(bookId,loggedUser.getId(), ratingRequest.rating()));
+        return ResponseEntity.ok(userBookService.updateUserBook(loggedUser.getId(),bookId, ratingRequest.rating()));
     }
 
     @DeleteMapping("/{username}/books/{bookId}")
@@ -69,7 +69,7 @@ public class UserBookController {
         if (!loggedUsername.equalsIgnoreCase(username)) {
             throw new AccessDeniedException("Você só pode alterar sua própria biblioteca!");
         }
-        userBookService.deleteBookFromUserLibrary(bookId, loggedUser.getId());
+        userBookService.deleteBookFromUserLibrary(loggedUser.getId(),bookId);
         return ResponseEntity.noContent().build();
     }
 }
