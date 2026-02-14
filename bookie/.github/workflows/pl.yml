@@ -21,11 +21,17 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Grant execute permissions
-        run: chmod +x mvnw
+      - name: Build Bookie API
+        run: |
+          chmod +x bookie/mvnw
+          cd bookie
+          ./mvnw clean package -DskipTests
 
-      - name: Build with maven
-        run: ./mvnw clean verify
+      - name: Build Timeline Service
+        run: |
+          chmod +x timeline/mvnw
+          cd timeline
+          ./mvnw clean package -DskipTests
 
       - name: :Login to dockerhub
         uses: docker/login-action@v3
@@ -33,12 +39,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push docker Image
+      - name: Build and push bookie docker Image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./bookie
+          file: ./bookie/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/bookie:latest
+
+      - name: Build and push timeline docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./timeline
+          file: ./timeline/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bookie-timeline:latest
 
   deploy:
       needs: build-and-push
@@ -46,25 +61,35 @@ jobs:
       if: github.ref == 'refs/heads/main'
 
       steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Copy docker-compose to EC2
+          uses: appleboy/scp-action@master
+          with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USERNAME }}
+            key: ${{ secrets.EC2_PRIVATE_KEY }}
+            source: "docker-compose.yml"
+            target: "/home/ec2-user/app"
+
         - name: Deploy to EC2 via SSH
-          uses: appleboy/ssh-action@v1.0.3
+          uses: appleboy/ssh-action@master
           with:
             host: ${{ secrets.EC2_HOST }}
             username: ec2-user
             key: ${{ secrets.EC2_PRIVATE_KEY }}
             port: 22
             script: |
-              docker stop bookie-api || true
-              docker rm bookie-api || true
-          
-              docker pull ${{ secrets.DOCKERHUB_USERNAME }}/bookie:latest
-                
-              docker run -d \
-               -p 8080:8080 \
-               --name bookie-api \
-               -e SPRING_PROFILES_ACTIVE=dev \
-               -e SPRING_DATA_URL=jdbc:postgresql://${{ secrets.RDS_ENDPOINT }}:5432/bookie_db \
-               -e SPRING_DATA_USERNAME=postgres \
-               -e SPRING_DATA_PASSWORD=${{ secrets.RDS_PASSWORD }} \
-               -e MY_SECRET_KEY=${{ secrets.JWT_SECRET }} \
-               ${{ secrets.DOCKERHUB_USERNAME }}/bookie:latest
+              cd /home/ec2-user/app
+
+              echo "POSTGRES_USER=postgres" > .env
+              echo "POSTGRES_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> .env
+              echo "POSTGRES_DB=bookie_db" >> .env
+              echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+              echo "RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}" >> .env
+              echo "RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }}" >> .env
+                  
+              docker-compose pull
+              docker-compose up -d --remove-orphans
+              docker image prune -f
