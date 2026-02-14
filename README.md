@@ -3,11 +3,25 @@
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
-![CI/CD Pipeline](https://github.com/matheusrdpa/bookie/actions/workflows/pl.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/Coverage-85%25-brightgreen.svg)
 
-Backend desenvolvido com Spring Boot para gerenciar livros, autores e a biblioteca pessoal dos usuários.
-A ideia do projeto é simples: manter um catálogo organizado, registrar o status de leitura e sugerir novos livros com base no que a pessoa já leu.
+Ecossistema distribuído desenvolvido com Spring Boot para gerenciar livros, autores, biblioteca pessoal dos usuários e gerar um sistema de "Feed" de noticias.
+A ideia do projeto é simples: manter um catálogo organizado, registrar o status de leitura, sugerir novos livros com base no que a pessoa já leu e mostrar uma timeline de atividades.
+
+# Funcionalidades Principais
+## Gestão de Catálogo (Bookie)
+- Autenticação Stateless: Sistema de login seguro utilizando Spring Security e JWT.
+
+- Catálogo Completo: Gerenciamento de Livros, Autores e Usuários com relacionamentos complexos.
+
+- Busca Avançada: Filtros dinâmicos utilizando JPA Specifications (busque por gênero, rating, autor, etc).
+
+- Sistema de Ratings: Usuários podem avaliar livros e gerenciar seu progresso de leitura.
+
+## Feed de Atividades (Timeline Service)
+- Reatividade: Um serviço independente que reage em tempo real a novos cadastros.
+
+- Histórico Independente: Mantém um log do que acontece no ecossistema.
 
 ## Tecnologias Utilizadas
 
@@ -16,7 +30,9 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
 | **Linguagem** | Java 
 | **Framework** | Spring Boot 
 | **Segurança** | Spring Security, JWT
+| **Mensageria** | RabbitMQ
 | **Persistência** | Spring Data JPA, Hibernate 
+| **Containerização** | Docker, Docker Compose
 | **Banco de Dados** | PostgreSQL 
 | **Utilidades** | MapStruct, Validation 
 | **Testes** | JUnit 5, Mockito, Rest Assured
@@ -27,6 +43,7 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
 * **CI/CD:** GitHub Actions (Automated Build, Test & Deploy)
 * **Cloud Provider:** AWS (EC2 / Amazon Linux 2023)
 * **Database:** AWS RDS (PostgreSQL)
+* **Microserviço e Mensageria** RabbitMQ
 
 ## O que a API faz
 
@@ -35,6 +52,7 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
 * **Biblioteca pessoal:** Usuários podem salvar livros e marcar como READ, READING ou NOT READ.
 * **Recomendações personalizadas:** Sugestão de livros com base nos autores e gêneros que o usuário já leu usando JPA Specifications. (Também aproveitei o projeto para aprender sobre specifications)
 * **Filtros e paginação:** Busca por título, autor, rating e combinações desses filtros.
+* **Timeline:** Lista de atividades.
 
 ## Como Rodar o Projeto
 
@@ -42,7 +60,7 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
 
 * Java 21+
 * Maven 3+
-* Um servidor PostgreSQL (ou docker se preferir).
+* Docker e Docker Compose
 
 ### Configuração
 
@@ -51,7 +69,13 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
     git clone https://github.com/Matheusrdpa/bookie
     cd bookie
     ```
-2.  **Configure o Banco de Dados:**
+2. Subir a infraestrutura (BD e Message Broker):
+   Utilize o docker-compose.yml para iniciar o PostgreSQL e o RabbitMQ:
+
+    ```
+     docker-compose up -d
+    ```
+3.  **Configure o Banco de Dados:**
     Edite o arquivo `src/main/resources/application-dev.properties` com as credenciais do seu PostgreSQL.
 
     ```
@@ -59,7 +83,7 @@ A ideia do projeto é simples: manter um catálogo organizado, registrar o statu
     spring.datasource.username=${SPRING_DATA_USERNAME}
     spring.datasource.password=${SPRING_DATA_PASSWORD}
     ```
-3.  **Adicione a Chave Secreta do JWT:**
+4.  **Adicione a Chave Secreta do JWT:**
     Adicionar sua chave secreta (variável de ambiente ou arquivo .properties):
     ```
     my-secret-key=SUA_KEY
@@ -74,7 +98,7 @@ Pelo Maven:
 ```
 
 
-A API estará disponivel em `http://localhost:8080`.
+A API estará disponivel em `http://localhost:8080` e o Microserviço estará disponivel em `http://localhost:8081`.
 
 ## Autenticação
 
@@ -100,7 +124,7 @@ Para acessar endpoints protegidos, envie o token JWT no header:
 | | `POST` | `/v1/book` | Cria um novo livro. | `ADMIN` |
 | **Biblioteca** | `POST` | `/v1/userbook` | Adiciona um livro à biblioteca do usuário logado. | `USER / ADMIN` |
 | | `GET` | `/v1/userbook/{username}/books` | Visualiza a biblioteca de um usuário. | `isAuthenticated()` |
-
+| **Timeline** | `GET` | `localhost:8081/timeline` | Retorna lista de atividades.
 ---
 
 ## Testes
