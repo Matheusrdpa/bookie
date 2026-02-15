@@ -68,6 +68,7 @@ services:
     deploy:
       resources:
         limits:
+          memory: 512M
       SERVER_PORT: 8081
       SPRING_RABBITMQ_HOST: rabbitmq-broker
       SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
