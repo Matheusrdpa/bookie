@@ -89,7 +89,7 @@ jobs:
               echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
               echo "RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}" >> .env
               echo "RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }}" >> .env
-                  
-              docker-compose pull
-              docker-compose up -d --remove-orphans
-              docker image prune -f
+              
+              sudo /usr/local/bin/docker-compose pull
+              sudo /usr/local/bin/docker-compose up -d --remove-orphans
+              sudo docker image prune -f
